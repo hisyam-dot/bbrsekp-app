@@ -77,60 +77,9 @@ DB_PASSWORD=
 
 ```bash
 php artisan storage:link
+
+## Admin Secret Code
+
+Set di .env:
+ADMIN_SECRET_CODE=BBRSEKP2026
 ```
-
----
-
-### 6. Jalankan Server
-
-```bash
-php artisan serve
-```
-
-Akses:
-
-```
-http://127.0.0.1:8000
-```
-
----
-
-## 🌐 Akses dari Device Lain
-
-```bash
-php artisan serve --host=0.0.0.0 --port=8000
-```
-
-Cek IP:
-
-```bash
-ipconfig
-```
-
-Akses dari device lain:
-
-```
-http://IP_ADDRESS:8000
-```
-
----
-
-## 🔐 Login
-
-Akun dibuat oleh admin melalui panel Filament.
-
-Akses admin:
-
-```
-http://localhost:8000/admin
-```
-
----
-
-## ⚠️ Catatan Penting
-
-- Pastikan device berada dalam jaringan yang sama
-- Pastikan firewall tidak memblokir port
-- Jalankan `npm run build` sebelum digunakan di device lain
-
----
