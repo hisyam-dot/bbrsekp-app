@@ -14,6 +14,3 @@ php artisan key:generate
 php artisan migrate --seed
 npm run dev
 php artisan storage:link
-
-## Admin Secret Code
-
