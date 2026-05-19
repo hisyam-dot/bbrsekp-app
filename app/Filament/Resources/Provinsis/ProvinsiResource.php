@@ -47,11 +47,16 @@ class ProvinsiResource extends Resource
         return $schema->schema([
             TextInput::make('nama')
                 ->label('Nama Provinsi')
-                ->required(),
+                ->required()
+                ->unique(ignoreRecord: true)
+                ->validationMessages([
+                    'unique' => 'Provinsi dengan nama tersebut sudah ada.'
+                ]),
             Hidden::make('created_by')
-                ->default(auth()->id()),
+                ->default(auth()->id())
+                ->dehydrated(fn ($operation) => $operation === 'create'),
             Hidden::make('updated_by')
-                ->default(auth()->id()),
+                ->dehydrated(false),
         ]);
     }
 
@@ -74,6 +79,7 @@ class ProvinsiResource extends Resource
                     ->sortable(),
                 TextColumn::make('updater.name')
                     ->label('Diubah Oleh')
+                    ->placeholder('-')
                     ->searchable()
                     ->sortable(),
             ]);

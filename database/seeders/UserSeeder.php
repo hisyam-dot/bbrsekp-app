@@ -18,6 +18,7 @@ class UserSeeder extends Seeder
         $admin = User::firstOrCreate(
             [
                 'name' => 'Admin BBRSEKP',
+                'username' => 'Admin',
                 'email' => 'admin@bbrsekp.go.id',
                 'password' => Hash::make('password'),
                 'role' => 'admin',
@@ -28,6 +29,7 @@ class UserSeeder extends Seeder
         $pegawai = User::firstOrCreate(
             [
                 'name' => 'Pegawai BBRSEKP',
+                'username' => 'Pegawai',
                 'email' => 'pegawai@bbrsekp.go.id', 
                 'password' => Hash::make('password'),
                 'role' => 'pegawai',

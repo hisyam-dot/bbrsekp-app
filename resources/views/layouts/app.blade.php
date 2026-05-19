@@ -16,13 +16,12 @@
     <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
         <div class="flex items-center gap-3">
             <img src="{{ asset('images/logo-kkp.png') }}" class="h-12" alt="Logo KKP">
-            <img src="{{ asset('images/logo-kkp-2026.png') }}" class="h-12" alt="Logo KKP 2026">
             <div>
                 <p class="text-sm font-bold text-blue-900">
                     BALAI BESAR RISET SOSIAL EKONOMI KELAUTAN DAN PERIKANAN
                 </p>
                 <p class="text-xs text-gray-600">
-                    Kementerian Kelautan dan Perikanan RI
+                    Badan Penyuluhan dan Pengembangan Sumber Daya Manusia - Kementerian Kelautan dan Perikanan RI
                 </p>
             </div>
         </div>
@@ -105,7 +104,6 @@
             {{-- LEFT --}}
             <div class="flex items-center space-x-3">
                 <img src="{{ asset('images/logo-kkp.png') }}" class="h-12" alt="Logo KKP">
-                <img src="{{ asset('images/logo-kkp-2026.png') }}" class="h-12" alt="Logo KKP 2026">
                 <span class="font-bold text-lg">
                     BALAI BESAR RISET SOSIAL EKONOMI KELAUTAN DAN PERIKANAN
                 </span>

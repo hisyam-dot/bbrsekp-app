@@ -18,4 +18,10 @@ class EditKabupaten extends EditRecord
             DeleteAction::make(),
         ];
     }
+
+    protected function mutateFormBeforeSave(array $data): array
+    {
+        $data['updated_by'] = auth()->id();
+        return $data;
+    }
 }

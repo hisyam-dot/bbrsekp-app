@@ -7,6 +7,7 @@ use App\Models\Kabupaten;
 use App\Models\Kecamatan;
 use App\Models\Desa;
 use App\Models\DetailDesa;
+use App\Models\User;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
@@ -17,19 +18,22 @@ class StatsOverView extends BaseWidget
         return [
             Stat::make('Total Provinsi', Provinsi::count())
                 ->icon('heroicon-o-map')
-                ->color('primary'),
+                ->description('Wilayah Provinsi'),
             Stat::make('Total Kabupaten', Kabupaten::count())
                 ->icon('heroicon-o-building-office')
-                ->color('success'),
+                ->description('Wilayah Kabupaten'),
             Stat::make('Total Kecamatan', Kecamatan::count())
                 ->icon('heroicon-o-map-pin')
-                ->color('warning'),
+                ->description('Wilayah Kecamatan'),
             Stat::make('Total Desa', Desa::count())
                 ->icon('heroicon-o-home')
-                ->color('info'),
-            Stat::make('Total Detail Desa', DetailDesa::count())
+                ->description('Wilayah Desa'),
+            Stat::make('Total Dokumen dan Informasi', DetailDesa::count())
                 ->icon('heroicon-o-document-text')
-                ->color('danger'),
+                ->description('Dokumen & Informasi'),
+            Stat::make('Total Manajemen User', User::count())
+                ->icon('heroicon-o-users')
+                ->description('Manajemen User'),
         ];
     }
 

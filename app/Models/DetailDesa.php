@@ -12,8 +12,9 @@ class DetailDesa extends Model
         'kabupaten_id',
         'kecamatan_id',
         'desa_id',
+        'profil',
+        'judul',
         'lokasi',
-        'profil_desa',
         'foto',
         'bahan_paparan',
         'laporan',
@@ -54,7 +55,7 @@ class DetailDesa extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    public function editor()
+    public function updater()
     {
         return $this->belongsTo(User::class, 'updated_by');
     }

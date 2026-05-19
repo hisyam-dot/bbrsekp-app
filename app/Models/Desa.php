@@ -37,13 +37,13 @@ class Desa extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    public function editor()
+    public function updater()
     {
         return $this->belongsTo(User::class, 'updated_by');
     }
 
     public function detailDesa()
     {
-        return $this->hasOne(DetailDesa::class);
+        return $this->hasMany(DetailDesa::class);
     }
 }

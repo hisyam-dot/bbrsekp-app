@@ -20,38 +20,17 @@ Route::get('/login', [AuthenticatedSessionController::class, 'create'])
 
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 
-// Register
-Route::get('/register', [RegisteredUserController::class, 'create'])
-->name('register');
-
-Route::post('/register', [RegisteredUserController::class, 'store'])
-->name('register.store');
-
 // Logout
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
 ->name('logout');
 
-// Forgot Password
-Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])
-->name('password.request');
-
-Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])
-->name('password.email');
-
-// Reset Password
-Route::get('/reset-password/{token}', [NewPasswordController::class, 'create'])
-->name('password.reset');
-
-Route::post('/reset-password', [NewPasswordController::class, 'store'])
-->name('password.update');
-
 Route::get('/', [PublicController::class, 'index'])->name('public.index');
-Route::get('/desa/{desa}', [PublicController::class, 'show'])->name('public.desa.show');
+Route::get('/desa/{detail}', [PublicController::class, 'show'])->name('public.desa.show');
 Route::get('/tentang', [PublicController::class, 'tentang'])->name('public.tentang');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/pegawai', [PegawaiController::class, 'index'])->name('pegawai.index');
-    Route::get('/pegawai/desa/{desa}', [PegawaiController::class, 'show'])->name('pegawai.desa.show');
+    Route::get('/pegawai/desa/{detail}', [PegawaiController::class, 'show'])->name('pegawai.desa.show');
     Route::get('/pegawai/tentang', [PegawaiController::class, 'tentang'])->name('pegawai.tentang');
 });
 

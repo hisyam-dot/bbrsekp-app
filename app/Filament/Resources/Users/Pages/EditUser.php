@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Filament\Resources\Kecamatans\Pages;
+namespace App\Filament\Resources\Users\Pages;
 
-use App\Filament\Resources\Kecamatans\KecamatanResource;
+use App\Filament\Resources\Users\UserResource;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 
-class EditKecamatan extends EditRecord
+class EditUser extends EditRecord
 {
-    protected static string $resource = KecamatanResource::class;
+    protected static string $resource = UserResource::class;
 
     protected function getHeaderActions(): array
     {
@@ -19,8 +19,7 @@ class EditKecamatan extends EditRecord
         ];
     }
 
-    protected function mutateFormDataBeforeSave(array $data): array
-    {
+    protected function mutateFormDataBeforeSave(array $data): array{
         $data['updated_by'] = auth()->id();
         return $data;
     }

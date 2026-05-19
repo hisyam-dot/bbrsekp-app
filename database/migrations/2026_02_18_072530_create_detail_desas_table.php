@@ -17,17 +17,20 @@ return new class extends Migration
                 ->constrained('provinsis')
                 ->cascadeOnDelete();
             $table->foreignId('kabupaten_id')
+                ->nullable()
                 ->constrained('kabupatens')
-                ->cascadeOnDelete();
+                ->nullOnDelete();
             $table->foreignId('kecamatan_id')
+                ->nullable()
                 ->constrained('kecamatans')
-                ->cascadeOnDelete();
+                ->nullOnDelete();
             $table->foreignId('desa_id')
-                ->unique()
+                ->nullable()
                 ->constrained('desas')
-                ->cascadeOnDelete();
-            $table->string('lokasi');
-            $table->text('profil_desa');
+                ->nullOnDelete();
+            $table->text('profil');
+            $table->string('judul');
+            $table->string('lokasi')->nullable();
             $table->json('foto')->nullable();
             $table->json('bahan_paparan')->nullable();
             $table->json('laporan')->nullable();
@@ -41,10 +44,6 @@ return new class extends Migration
                 ->constrained('users')
                 ->nullOnDelete();
             $table->timestamps();
-
-            $table->unique(['provinsi_id', 'desa_id']);
-            $table->unique(['kabupaten_id', 'desa_id']);
-            $table->unique(['kecamatan_id', 'desa_id']);
         });
     }
 

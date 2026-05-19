@@ -53,9 +53,10 @@ class KabupatenResource extends Resource
                 ->label('Nama Kabupaten')
                 ->required(),
             Hidden::make('created_by')
-                ->default(auth()->id()),
+                ->default(auth()->id())
+                ->dehydrated(fn ($operation) => $operation === 'create'),
             Hidden::make('updated_by')
-                ->default(auth()->id()),
+                ->dehydrated(false),
         ]);
     }
 
@@ -82,6 +83,7 @@ class KabupatenResource extends Resource
                     ->sortable(),
                 TextColumn::make('updater.name')
                     ->label('Diubah Oleh')
+                    ->placeholder('-')
                     ->searchable()
                     ->sortable(),
             ]);

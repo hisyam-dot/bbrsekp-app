@@ -24,6 +24,11 @@ use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\DeleteAction;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Filament\Actions\Action;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\DokumenInformasiExcel;
 
 class DetailDesaResource extends Resource
 {
@@ -31,13 +36,13 @@ class DetailDesaResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static ?string $recordTitleAttribute = 'Detail Desa';
+    protected static ?string $recordTitleAttribute = 'Dokumen dan Informasi';
 
     protected static ?string $navigationLabel = 'Dokumen dan Informasi';
 
-    protected static ?string $pluralModelLabel = 'Detail Desa';
+    protected static ?string $pluralModelLabel = 'Dokumen dan Informasi';
 
-    protected static ?string $modelLabel = 'Detail Desa';
+    protected static ?string $modelLabel = 'Dokumen dan Informasi';
 
     protected static ?int $navigationSort = 5;
 
@@ -67,7 +72,7 @@ class DetailDesaResource extends Resource
                     $set('kecamatan_id', null),
                     $set('desa_id', null)
                 ])
-                ->required(),
+                ->nullable(),
             Select::make('kecamatan_id')
                 ->label('Kecamatan')
                 ->relationship(name: 'kecamatan',
@@ -79,7 +84,7 @@ class DetailDesaResource extends Resource
                 ->afterStateUpdated(fn ($set) => [
                     $set('desa_id', null)
                 ])
-                ->required(),
+                ->nullable(),
             Select::make('desa_id')
                 ->label('Desa')
                 ->relationship(name: 'desa',
@@ -88,26 +93,38 @@ class DetailDesaResource extends Resource
                 ->searchable()
                 ->reactive()
                 ->disabled(fn ($get) => !$get('kecamatan_id'))
-                ->required(),
+                ->nullable(),
+            TextArea::make('profil')
+                ->label('Profil')
+                ->rows(6),
+            TextInput::make('judul')
+                ->label('Judul'),
             TextInput::make('lokasi')
-                ->label('Lokasi Desa')
-                ->url()
-                ->required(),
-            TextArea::make('profil_desa')
-                ->label('Profil Desa')
-                ->rows(6)
-                ->required(),
+                ->label('Lokasi')
+                ->url(),
             FileUpload::make('foto')
-                ->label('Foto Desa')
+                ->label('Foto')
                 ->multiple()
+                ->maxFiles(4)
+                ->maxSize(5120)
                 ->image()
                 ->disk('public')
-                ->directory('fotos'),
+                ->directory('fotos')
+                ->helperText('Format: jpg, jpeg, png. Maksimal ukuran per file: 5MB. Maksimal jumlah file: 4.'),
             FileUpload::make('bahan_paparan')
                 ->label('Bahan Paparan')
                 ->multiple()
+                ->maxFiles(4)
+                ->maxSize(10240)
                 ->disk('public')
                 ->directory('bahan_paparans')
+                ->getUploadedFileNameForStorageUsing(function ($file) {
+                    $namaAsli = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                    $ext = $file->getClientOriginalExtension();
+                    $namaFormatted = Str::title(str_replace(['-', '_'], ' ', $namaAsli));
+
+                    return Str::slug($namaAsli) . '-' . time() . '.' . $ext;
+                })
                 ->acceptedFileTypes([
                     'application/pdf',
                     'application/msword',
@@ -116,26 +133,46 @@ class DetailDesaResource extends Resource
                     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                     'application/vnd.ms-powerpoint',
                     'application/vnd.openxmlformats-officedocument.presentationml.presentation'
-                ]),
+                ])
+                ->helperText('Format: pdf, doc, docx, xls, xlsx, ppt, pptx. Maksimal ukuran per file: 10MB. Maksimal jumlah file: 4.'),
             FileUpload::make('laporan')
-                    ->label('Laporan')
-                    ->multiple()
-                    ->disk('public')
-                    ->directory('laporans')
-                    ->acceptedFileTypes([
-                        'application/pdf',
-                        'application/msword',
-                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                        'application/vnd.ms-excel',
-                        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                        'application/vnd.ms-powerpoint',
-                        'application/vnd.openxmlformats-officedocument.presentationml.presentation'
-                    ]),
+                ->label('Laporan')
+                ->multiple()
+                ->maxFiles(4)
+                ->maxSize(10240)
+                ->disk('public')
+                ->directory('laporans')
+                ->getUploadedFileNameForStorageUsing(function ($file) {
+                    $namaAsli = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                    $ext = $file->getClientOriginalExtension();
+                    $namaFormatted = Str::title(str_replace(['-', '_'], ' ', $namaAsli));
+
+                    return Str::slug($namaAsli) . '-' . time() . '.' . $ext;
+                })
+                ->acceptedFileTypes([
+                    'application/pdf',
+                    'application/msword',
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    'application/vnd.ms-excel',
+                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                    'application/vnd.ms-powerpoint',
+                    'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+                ])
+                ->helperText('Format: pdf, doc, docx, xls, xlsx, ppt, pptx. Maksimal ukuran per file: 10MB.Maksimal jumlah file: 4.'),
             FileUpload::make('dokumen')
                 ->label('Dokumen Lainnya')
                 ->multiple()
+                ->maxFiles(8)
+                ->maxSize(10240)
                 ->disk('public')
                 ->directory('dokumens')
+                ->getUploadedFileNameForStorageUsing(function ($file) {
+                    $namaAsli = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                    $ext = $file->getClientOriginalExtension();
+                    $namaFormatted = Str::title(str_replace(['-', '_'], ' ', $namaAsli));
+
+                    return Str::slug($namaAsli) . '-' . time() . '.' . $ext;
+                })
                 ->acceptedFileTypes([
                     'application/pdf',
                     'application/msword',
@@ -144,11 +181,13 @@ class DetailDesaResource extends Resource
                     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                     'application/vnd.ms-powerpoint',
                     'application/vnd.openxmlformats-officedocument.presentationml.presentation'
-                ]),
+                ])
+                ->helperText('Format: pdf, doc, docx, xls, xlsx, ppt, pptx. Maksimal ukuran per file: 10MB. Maksimal jumlah file: 8.'),
             Hidden::make('created_by')
-                ->default(auth()->id()),
+                ->default(auth()->id())
+                ->dehydrated(fn ($operation) => $operation === 'create'),
             Hidden::make('updated_by')
-                ->default(auth()->id()),
+                ->dehydrated(false),
         ]);
     }
 
@@ -165,22 +204,31 @@ class DetailDesaResource extends Resource
                     ->label('Provinsi')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('desa.nama')
-                    ->label('Desa')
+                TextColumn::make('judul')
+                    ->label('Judul')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('lokasi')
                     ->label('Lokasi')
-                    ->url(fn ($record) => $record->lokasi)
-                    ->openUrlInNewTab(),
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('creator.name')
                     ->label('Dibuat Oleh') 
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('updater.name')
                     ->label('Diubah Oleh')
+                    ->placeholder('-')
                     ->searchable()
                     ->sortable(),
+            ])
+            ->HeaderActions([
+                Action::make('export')
+                    ->label('Download Excel')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->action(function () {
+                        return Excel::download(new DokumenInformasiExcel, 'dokumen_informasi.xlsx');
+                    }),
             ]);
     }
 

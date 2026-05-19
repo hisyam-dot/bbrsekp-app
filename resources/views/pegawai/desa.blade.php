@@ -1,44 +1,55 @@
 @extends('layouts.app')
 
 @section('content')
-<section class="max-w-6xl mx-auto px-6 py-12">
+<section class="max-w-6xl mx-auto px-6 py-1">
 
-    <div class="mb-6">
+    <div class="mb-3">
         <a href="{{ route('pegawai.index') }}"
-           class="inline-flex items-center text-sm text-blue-700 hover:underline">
+        class="inline-flex items-center text-sm text-blue-700 hover:underline">
             ← Kembali
         </a>
     </div>
 
-    <h1 class="text-3xl font-bold text-blue-900 mb-6">
-        {{ $desa->nama }}
+    <h1 class="text-3xl font-bold text-blue-900 mb-1">
+        {{
+            $detail->nama
+            ?? $detail->kecamatan->nama
+            ?? $detail-> kabupaten->nama
+            ?? $detail->provinsi->nama
+        }} - {{ $detail->judul }}
     </h1>
 
-    <p class="text-gray-600 mb-8">
-        {{ $desa->kecamatan->nama }},
-        {{ $desa->kecamatan->kabupaten->nama }},
-        {{ $desa->kecamatan->kabupaten->provinsi->nama }}
+    @php
+        $lokasi = collect([
+        $detail->kecamatan->nama ?? null,
+        $detail->kabupaten->nama ?? null,
+        $detail->provinsi->nama ?? null,
+        ])->filter()->implode(', ');
+    @endphp
+    
+    <p class="text-gray-600 mb-3">
+        {{ $lokasi ?: '-' }}
     </p>
 
-    <div class="mt-8">
-        <h2 class="text-xl font-semibold mb-4">Profil</h2>
+    <div class="mt-3">
+        <h2 class="text-xl font-semibold mb-1">Profil / Deskripsi</h2>
 
-        @if($desa->detailDesa)
-            <p class="text-gray-700 leading-relaxed mb-8">
-                {{ $desa->detailDesa->profil_desa }}
+        @if($detail->profil)
+            <p class="text-gray-700 leading-relaxed mb-3">
+                {{ $detail->profil }}
             </p>
         @else
-            <p class="text-gray-500 mb-8">
-                Profil desa belum tersedia.
+            <p class="text-gray-500 mb-3">
+                Profil / deskripsi belum tersedia.
             </p>
         @endif
     </div>
 
-    <div class="mt-8">
-        <h2 class="text-xl font-semibold mb-4">Lokasi</h2>
+    <div class="mt-3">
+        <h2 class="text-xl font-semibold mb-1">Lokasi</h2>
 
-        @if($desa->detailDesa && $desa->detailDesa->lokasi)
-            <a href="{{ $desa->detailDesa->lokasi }}"
+        @if($detail->lokasi)
+            <a href="{{ $detail->lokasi }}"
                 target="_blank"
                 class="text-blue-600 hover:underline">
                 Lihat Lokasi di Google Maps →
@@ -48,18 +59,18 @@
         @endif
     </div>
 
-    <div class="mt-8">
-        <h2 class="text-xl font-semibold mb-4">Foto Desa</h2>
+    <div class="mt-3">
+        <h2 class="text-xl font-semibold mb-1">Foto Lokasi</h2>
 
-        @if($desa->detailDesa?->foto)
+        @if($detail->foto)
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            @foreach($desa->detailDesa->foto as $foto)
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            @foreach($detail->foto as $foto)
                 <div class ="group relative cursor-pointer"
                 onclick="openModal('{{ asset('storage/'.$foto) }}')">
             
             <img src="{{ asset('storage/'.$foto) }}"
-                class="w-full h-56 object-cover rounded-lg shadow-md transform transition duration-300 group-hover:scale-105 group-hover:shadow-xl">
+                class="w-full h-40 object-cover rounded-lg shadow-md transform transition duration-300 group-hover:scale-105 group-hover:shadow-xl">
             </div>
             @endforeach
         </div>
@@ -90,15 +101,15 @@
         @endif
     </div>
 
-    <div class="mt-8">
-        <h2 class="text-xl font-semibold mb-4">Bahan Paparan</h2>
+    <div class="mt-3">
+        <h2 class="text-xl font-semibold mb-1">Bahan Paparan</h2>
 
-        @if($desa->detailDesa?->bahan_paparan)
+        @if($detail->bahan_paparan)
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
 
-                @foreach($desa->detailDesa->bahan_paparan as $bahan_paparan)
-                    <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-xl transition duration-300">
+                @foreach($detail->bahan_paparan as $bahan_paparan)
+                    <div class="bg-white rounded-lg shadow-md p-1 text-center text-sm hover:shadow-xl transition duration-300">
 
                         <div class="text-4xl mb-3">📄</div>
 
@@ -121,15 +132,15 @@
         @endif
     </div>
 
-    <div class="mt-8">
-        <h2 class="text-xl font-semibold mb-4">Laporan</h2>
+    <div class="mt-3">
+        <h2 class="text-xl font-semibold mb-1">Laporan</h2>
 
-        @if($desa->detailDesa?->laporan)
+        @if($detail->laporan)
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
 
-                @foreach($desa->detailDesa->laporan as $laporan)
-                    <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-xl transition duration-300">
+                @foreach($detail->laporan as $laporan)
+                    <div class="bg-white rounded-lg shadow-md p-1 text-center text-sm hover:shadow-xl transition duration-300">
 
                         <div class="text-4xl mb-3">📄</div>
 
@@ -152,15 +163,15 @@
         @endif
     </div>
 
-    <div class="mt-8">
-        <h2 class="text-xl font-semibold mb-4">Dokumen Lainnya</h2>
+    <div class="mt-3">
+        <h2 class="text-xl font-semibold mb-1">Dokumen Lainnya</h2>
 
-        @if($desa->detailDesa?->dokumen)
+        @if($detail->dokumen)
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
 
-                @foreach($desa->detailDesa->dokumen as $dokumen)
-                    <div class="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-xl transition duration-300">
+                @foreach($detail->dokumen as $dokumen)
+                    <div class="bg-white rounded-lg shadow-md p-1 text-center text-sm hover:shadow-xl transition duration-300">
 
                         <div class="text-4xl mb-3">📄</div>
 

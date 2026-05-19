@@ -55,19 +55,6 @@
         </button>
     </form>
 
-    {{-- LINK REGISTER & FORGOT --}}
-    <div class="flex justify-between text-sm mt-4">
-        <a href="{{ route('register') }}" 
-        class="text-blue-700 hover:underline">
-            Belum punya akun?
-        </a>
-
-        <a href="{{ route('password.request') }}" 
-        class="text-blue-700 hover:underline">
-            Lupa Password?
-        </a>
-    </div>
-
     {{-- KEMBALI KE PUBLIK --}}
     <div class="text-center mt-6">
         <a href="{{ route('public.index') }}"

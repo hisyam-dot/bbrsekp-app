@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Desa;
+use App\Models\DetailDesa;
+use App\Models\SearchLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -12,115 +14,119 @@ class PegawaiController extends Controller
     {
         $search = $request->q;
 
-        $desas = Desa::with('kecamatan.kabupaten.provinsi')
+        $details = DetailDesa::with('desa.kecamatan.kabupaten.provinsi')
             ->when($search, function ($query) use ($search) {
-                $query->where('nama', 'like', "%{$search}%")
-                      ->orWhereHas('kecamatan', function ($q) use ($search) {
-                          $q->where('nama', 'like', "%{$search}%")
-                            ->orWhereHas('kabupaten', function ($q2) use ($search) {
+                $query->where('judul', 'like', "%{$search}%")
+                    ->orWhereHas('desa', function($q) use ($search) {
+                        $q->where('nama', 'like', "%{$search}%")
+                            ->orWhereHas('kecamatan', function ($q2) use ($search) {
                                 $q2->where('nama', 'like', "%{$search}%")
-                                   ->orWhereHas('provinsi', function ($q3) use ($search) {
-                                       $q3->where('nama', 'like', "%{$search}%");
-                                   });
+                                    ->orWhereHas('kabupaten', function ($q3) use ($search) {
+                                        $q3->where('nama', 'like', "%{$search}%")
+                                            ->orWhereHas('provinsi', function ($q4) use ($search) {
+                                                $q4->where('nama', 'like', "%{$search}%");
                             });
-                      });
+                        });
+                    });
+                });
             })
-            ->orderBy('nama')
+            ->orderBy('judul')
             ->paginate(10)
             ->withQueryString();
 
-        return view('pegawai.index', compact('desas', 'search'));
+        if ($search) {
+            $keyword = Str::lower(trim($search));
+
+            $log = SearchLog::where('keyword', $keyword)->first();
+
+            if ($log) {
+                $log->increment('total');
+            } else {
+                SearchLog::create([
+                    'keyword' => $keyword,
+                    'total' => 1,
+                ]);
+            }
+        }
+
+        $populer = SearchLog::orderByDesc('total')
+            ->limit(5)
+            ->get();
+
+        $details->total();
+
+        return view('pegawai.index', compact('details', 'search', 'populer'));
     }
 
-    public function show(Desa $desa)
+    public function show(DetailDesa $detail)
     {
-        $desa->load('detailDesa', 'kecamatan.kabupaten.provinsi');
-
-        return view('pegawai.desa', compact('desa'));
+        $detail->load( 'desa.kecamatan.kabupaten.provinsi');
+        
+        return view('pegawai.desa', compact('detail'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'foto.*' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
-            'bahan_paparan.*' => 'nullable|mimes:pdf,doc,docx,xsl,xlsx',
-            'laporan.*' => 'nullable|mimes:pdf,doc,docx,xsl,xlsx',
-            'dokumen.*' => 'nullable|mimes:pdf,doc,docx,xsl,xlsx',
+            'bahan_paparan.*' => 'nullable|file|mimes:pdf,doc,docx,xsl,xlsx|max:10240',
+            'laporan.*' => 'nullable|file|mimes:pdf,doc,docx,xsl,xlsx|max:10240',
+            'dokumen.*' => 'nullable|file|mimes:pdf,doc,docx,xsl,xlsx|max:10240',
         ]);
 
-        $fotoPaths = [];
-        if ($request->hasFile('foto')) {
-
-            foreach ($request->file('foto') as $foto) {
-
-                $namaAsli = pathinfo($foto->getClientOriginalName(), PATHINFO_FILENAME);
-                $ext = $foto->getClientOriginalExtension();
-
-                $namaBersih = Str::slug($namaAsli);
-
-                $namaFinal = $namaBersih . '-' . time() . '-' . uniqid() . '.' . $ext;
-
-                $fotoPaths[] = $foto->storeAs(
-                    'fotos',
-                    $namaFinal,
-                    'public'  
-                );
-            }
-        }
-
+        $bahanPaparanPaths = [];
+        $laporanPaths = [];
         $dokumenPaths = [];
+
+        // Bahan Paparan
         if ($request->hasFile('bahan_paparan')) {
 
-            foreach ($request->file('bahan_paparan')as $dok) {
+            foreach ($request->file('bahan_paparan') as $file) {
 
-                $namaAsli = pathinfo($dok->getClientOriginalName(), PATHINFO_FILENAME);
-                $ext = $dok->getClientOriginalExtension();
+                $namaFile = now()->timestamp . '_' . $file->getClientOriginalName();
 
-                $namaBersih = Str::slug($namaAsli);
-
-                $namaFinal = $namaBersih . '-' . time(). '-' . uniqid() . '.' . $ext;
-
-                $dokumenPaths[] = $dok->storeAs(
+                $bahanPaparanPaths[] = $file->storeAs(
                     'bahan_paparans',
-                    $namaFinal,
+                    $namaFile,
                     'public'
                 );
+
             }
+
         }
 
-        $dokumenPaths = [];
+        // Laporan
         if ($request->hasFile('laporan')) {
 
-            foreach ($request->file('laporan') as $dok) {
-                $nama = Str::slug(pathinfo($dok->getClientOriginalName(), PATHINFO_FILENAME));
-                $ext = $dok->getClientOriginalExtension();
+            foreach ($request->file('laporan') as $file) {
 
-                $namaFinal = $nama . '.' . $ext;
+                $namaFile = now()->timestamp . '_' . $file->getClientOriginalName();
 
-                $dokumenPaths[] = $dok->storeAs(
+                $laporanPaths[] = $file->storeAs(
                     'laporans',
-                    $namaFinal,
+                    $namaFile,
                     'public'
                 );
+
             }
+
         }
 
-        $dokumenPaths = [];
+        // Dokumen Lainnya
         if ($request->hasFile('dokumen')) {
 
-            foreach ($request->file('dokumen') as $dok) {
+            foreach ($request->file('dokumen') as $file) {
 
-                $nama = Str::slug(pathinfo($dok->getClientOriginalName(), PATHINFO_FILENAME));
-                $ext = $dok->getClientOriginalExtension();
+                $namaFile = now()->timestamp . '_' . $file->getClientOriginalName();
 
-                $namaFinal = $nama . '.' . $ext;
-
-                $dokumenPaths[] = $dok->storeAs(
+                $dokumenPaths[] = $file->storeAs(
                     'dokumens',
-                    $namaFinal,
+                    $namaFile,
                     'public'
                 );
+
             }
+
         }
 
         DetailDesa::create([
@@ -137,6 +143,8 @@ class PegawaiController extends Controller
 
     public function tentang()
     {
-        return view('pegawai.tentang');
+        $desas = Desa::with('detailDesa')->get();
+
+        return view('pegawai.tentang', compact('desas'));
     }
 }

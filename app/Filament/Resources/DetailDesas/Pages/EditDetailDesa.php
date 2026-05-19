@@ -16,4 +16,9 @@ class EditDetailDesa extends EditRecord
             DeleteAction::make(),
         ];
     }
+
+    protected function mutateFormDataBeforeSave(array $data): array{
+        $data['updated_by'] = auth()->id();
+        return $data;
+    }
 }

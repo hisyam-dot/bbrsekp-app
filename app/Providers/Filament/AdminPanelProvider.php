@@ -6,6 +6,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\MenuItem;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -39,8 +40,6 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
-                AccountWidget::class,
-                FilamentInfoWidget::class,
                 \App\Filament\Widgets\StatsOverView::class,
             ])
             ->middleware([
@@ -61,6 +60,12 @@ class AdminPanelProvider extends PanelProvider
                 'auth',
             ])
             ->globalSearch(false)
+            ->userMenuItems([
+                'logout' => MenuItem::make()
+                    ->label('Kembali')
+                    ->url(fn () => route('pegawai.index'))
+                    ->icon('heroicon-o-arrow-left')
+            ])
             ->brandName('BBRSEKP Admin');
     }
 
@@ -69,7 +74,7 @@ class AdminPanelProvider extends PanelProvider
     public function boot(): void
     {
         Filament::serving(function () {
-            abort_unless(auth()->user()?->hasRole('admin'), 403);
+            abort_unless(auth()->user()?->role === 'admin', 403);
         });
     }
 

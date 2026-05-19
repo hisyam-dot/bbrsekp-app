@@ -1,21 +1,136 @@
-# BBRSEKP Web Application
+# BBRSEKP Information System
 
-Sistem Informasi Desa - BBRSEKP
+Sistem Informasi Desa berbasis web untuk menampilkan data wilayah (Provinsi, Kabupaten, Kecamatan, Desa) serta dokumen dan informasi pendukung.
 
-## Setup
+---
 
-1. Clone repository
-2. Copy .env.example menjadi .env
-3. Jalankan:
+## 🚀 Fitur Utama
 
+- Manajemen wilayah (Provinsi, Kabupaten, Kecamatan, Desa)
+- Manajemen data desa dan informasi
+- Upload dokumen (foto, laporan, bahan paparan, dll)
+- Pencarian data + pencarian populer
+- Dashboard admin (Filament)
+- Role user (Admin & Pegawai)
+
+---
+
+## 🛠️ Teknologi
+
+- Laravel 10+
+- Filament Admin Panel
+- MySQL
+- Tailwind CSS
+- Livewire
+
+---
+
+## 📦 Instalasi
+
+### 1. Clone / Extract Project
+
+```bash
+git clone <repo-url>
+cd bbrsekp
+```
+
+---
+
+### 2. Install Dependency
+
+```bash
 composer install
 npm install
+npm run build
+```
+
+---
+
+### 3. Setup Environment
+
+```bash
+cp .env.example .env
 php artisan key:generate
-php artisan migrate --seed
-npm run dev
+```
+
+---
+
+### 4. Setup Database
+
+- Buat database: `bbrsekp`
+- Import file `.sql`
+
+Atur `.env`:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=bbrsekp
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+---
+
+### 5. Storage Link
+
+```bash
 php artisan storage:link
+```
 
-## Admin Secret Code
+---
 
-Set di .env:
-ADMIN_SECRET_CODE=BBRSEKP2026
+### 6. Jalankan Server
+
+```bash
+php artisan serve
+```
+
+Akses:
+
+```
+http://127.0.0.1:8000
+```
+
+---
+
+## 🌐 Akses dari Device Lain
+
+```bash
+php artisan serve --host=0.0.0.0 --port=8000
+```
+
+Cek IP:
+
+```bash
+ipconfig
+```
+
+Akses dari device lain:
+
+```
+http://IP_ADDRESS:8000
+```
+
+---
+
+## 🔐 Login
+
+Akun dibuat oleh admin melalui panel Filament.
+
+Akses admin:
+
+```
+http://localhost:8000/admin
+```
+
+---
+
+## ⚠️ Catatan Penting
+
+- Pastikan device berada dalam jaringan yang sama
+- Pastikan firewall tidak memblokir port
+- Jalankan `npm run build` sebelum digunakan di device lain
+
+---
