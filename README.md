@@ -77,9 +77,4 @@ DB_PASSWORD=
 
 ```bash
 php artisan storage:link
-
-## Admin Secret Code
-
-Set di .env:
-ADMIN_SECRET_CODE=BBRSEKP2026
 ```
